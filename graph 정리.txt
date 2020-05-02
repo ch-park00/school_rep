@@ -1,0 +1,42 @@
+graph
+- 상호 연결을 표현한 것(지하철 노선도, 조직도 등)
+- 배열이나 SLL/DLL을 이용해 구현이 가능하다.
+- edge와 vertex로 구성되어 있다.
+
+* edge : 각 node를 연결하는 선
+* vertex : 각 node 
+
+ 배열을 이용한 구현
+- 각각의 vertex를 연결하는 배열을 표현
+ex) A, B, C, D 라는 vertex가 존재할 때
+   A B C D
+A 0 1 1 1
+B 1 0 0 1
+C 1 0 0 0
+D 1 1 0 0
+
+이런 식의 2차 배열로 표현 가능
+
+SLL을 이용한 구현
+- 각각의 vertex에 대해 연결되어 있는 edge를 SLL로 모든 vertex에 대해 추가한다.
+
+그래프 종류
+- undirected graph : 방향성이 없는 edge로 구성. 
+- directed graph : 방향성이 있는 edge로 구성(A->B로 연결되어 있다). 
+- weighted graph : edge가 가중치를 가진다. 우선순위가 높은 edge가 존재할 경우 사용한다.
+
+그래프에 있는 모든 vertex에 대해 겹치지 않고 한번씩만 방문하는 방법
+
+- Depth first search : 깊이 우선 탐색. 그래프가 있을 때, 해당 길이 끊어지지 않은 이상 길의 끝까지 가서
+해당 경로에 있는 vertex를 우선 방문. 이후 길이 끝났을 때 옆에 존재하는 경로에 있는 vertex 방문.
+Stack 이용해 구현한다.
+- Breadth first search : 너비 우선 탐색. 그래프가 존재할 때, 해당 층에 있는 vertex 우선 방문.
+해당 층을 우선 방문한 다음 다음 경로를 쫓아 내려가서 모든 vertex 방문한다.
+Queue 이용해 구현한다.
+
+- DFS/BFS psudo code
+1. 시작 vertex를 stack/queue에 push
+2. stack/queue에 있는 vertex를 pop
+3. pop한 vertex가 방문하지 않은 vertex이면 방문한 vertex로 표시
+4. 이후 해당 vertex와 연결되어 있는 vertex 모두 체크해 stack/queue에 push
+5. 2로 돌아가 해당 과정 반복. 이 과정을 stack/queue가 empty될때까지 반복한다.

@@ -1,0 +1,141 @@
+#if 0
+#define max_size 9999999
+struct dijkstra
+{
+	int data;
+	int prev;
+	int w;
+};
+int num1, num2;
+int start;
+int **graph;
+struct dijkstra *table = 0;
+struct dijkstra *heap = 0;
+int heap_pointer = 0;
+void addEdge(int src, int dst, int weight)
+{
+	int idx1 = src - 1;
+	int idx2 = dst - 1;
+	if (graph[idx1][idx2] > weight)
+	{
+		graph[idx1][idx2] = weight;
+	}
+}
+void add2heap(struct dijkstra data)
+{
+	heap_pointer++;
+	heap[heap_pointer] = data;
+	int cur = heap_pointer;
+	while (1)
+	{
+		int parent = cur / 2;
+		if (parent < 1 || heap[parent].w < heap[cur].w)	break;
+		else
+		{
+			struct dijkstra tmp = heap[parent];
+			heap[parent] = heap[cur];
+			heap[cur] = tmp;
+			cur = parent;
+		}
+	}
+}
+int pop_from_heap()
+{
+	if (heap_pointer == 0)	return -1;
+	int idx = heap[1].data - 1;
+	heap[1] = heap[heap_pointer];
+	heap_pointer--;
+	int cur = 1;
+	while (1)
+	{
+		int left = cur * 2;
+		int right = left + 1;
+		int min = cur;
+		if (left <= heap_pointer && heap[left].w < heap[min].w)
+		{
+			min = left;
+		}
+		if (right <= heap_pointer && heap[right].w < heap[min].w)
+		{
+			min = right;
+		}
+		if (min == cur)	break;
+		else {
+			struct dijkstra tmp = heap[min];
+			heap[min] = heap[cur];
+			heap[cur] = tmp;
+			cur = min;
+		}
+	}
+	return idx;
+}
+void fix_table(int index)
+{
+	for (int i = 0; i < num1; i++)
+	{
+		if (table[i].w > table[index].w + graph[index][i])
+		{
+			table[i].w = table[index].w + graph[index][i];
+			table[i].prev = index + 1;
+			add2heap(table[i]);
+		}
+	}
+}
+void print_result()
+{
+	for (int i = 0; i < num1; i++)
+	{
+		if (table[i].w == max_size)
+		{
+			printf("INF\n");
+		}
+		else
+		{
+			printf("%d\n", table[i].w);
+		}
+	}
+}
+void do_dijkstra(int start_vertex)
+{
+	heap = (struct dijkstra*)malloc(sizeof(struct dijkstra)*num2);
+	table = (struct dijkstra *)malloc(sizeof(struct dijkstra)*num1);
+	for (int i = 0; i < num1; i++)
+	{
+		table[i].data = i + 1;
+		table[i].prev = 0;
+		table[i].w = max_size;
+	}
+	table[start_vertex - 1].w = 0;
+	add2heap(table[start_vertex - 1]);
+	while (1)
+	{
+		int idx = pop_from_heap();
+		if (idx == -1)	break;
+		fix_table(idx);
+	}
+	print_result();
+}
+int main()
+{
+	int start;
+	scanf("%d %d", &num1, &num2);
+	graph = (int**)malloc(sizeof(int*)*num1);
+	for (int i = 0; i < num1; i++)
+	{
+		graph[i] = (int*)malloc(sizeof(int)*num1);
+		for (int j = 0; j < num1; j++)
+		{
+			graph[i][j] = max_size;
+		}
+	}
+	scanf("%d", &start);
+	for (int i = 0; i < num2; i++)
+	{
+		int src, dst, w;
+		scanf("%d %d %d", &src, &dst, &w);
+		addEdge(src, dst, w);
+	}
+	do_dijkstra(start);
+	return 0;
+}
+#endif
