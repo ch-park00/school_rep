@@ -1,0 +1,817 @@
+1. DFS구현
+#include <stdio.h>
+#include <stdlib.h>
+//DFS, BFS
+struct vertex
+{
+	char v;
+	struct vertex *next;
+};
+struct visit
+{
+	char v;
+	struct visit *left;
+	struct visit *right;
+};
+struct vertex *graph[7] = { 0 };
+struct visit *visited = 0;
+struct vertex *stack = 0;
+void push(char src)
+{
+	struct vertex *new1 = (struct vertex*)malloc(sizeof(struct vertex));
+	new1->v = src;
+	new1->next = 0;
+
+	new1->next = stack;
+	stack = new1;
+}
+char pop()
+{
+	if (stack == 0)
+	{
+		return '-';
+	}
+	struct vertex *temp = stack;
+	char temp1 = stack->v;
+	stack = stack->next;
+	free(temp);
+	return temp1;
+}
+int getidx(char src)
+{
+	return src - 'A';
+}
+void addedgemini(char src, char dst)
+{
+	int idx = getidx(src);
+	struct vertex *new1 = (struct vertex*)malloc(sizeof(struct vertex));
+	new1->v = dst;
+	new1->next = 0;
+
+	if (graph[idx] == 0)
+	{
+		graph[idx] = new1;
+	}
+	else
+	{
+		struct vertex *temp = graph[idx];
+		while (temp->next != 0)
+		{
+			temp = temp->next;
+		}
+		temp->next = new1;
+	}
+}
+void addedge(char src, char dst)
+{
+	addedgemini(src, dst);
+	addedgemini(dst, src);
+}
+int checkvisit(char src)
+{
+	struct visit *temp = visited;
+	while (temp != 0)
+	{
+		if (temp->v == src)
+		{
+			return 1;
+		}
+		if (temp->v > src)
+		{
+			temp = temp->left;
+		}
+		else
+		{
+			temp = temp->right;
+		}
+	}
+	return 0;
+}
+void addvisited(char src)
+{
+	struct visit *new1 = (struct visit *)malloc(sizeof(struct visit));
+	new1->v = src;
+	new1->left = 0;
+	new1->right = 0;
+
+	if (visited == 0)
+	{
+		visited = new1;
+	}
+	else
+	{
+		struct visit *temp = visited;
+		while (1)
+		{
+			if (temp->v > src)
+			{
+				if (temp->left == 0)
+				{
+					temp->left = new1;
+					return;
+				}
+				temp = temp->left;
+			}
+			else
+			{
+				if (temp->right == 0)
+				{
+					temp->right = new1;
+					return;
+				}
+				temp = temp->right;
+			}
+		}
+	}
+}
+void performDFS(char src)
+{
+	push(src);
+	while (1)
+	{
+		char t = pop();
+		if (t == '-')
+		{
+			return;
+		}
+		else
+		{
+			if (checkvisit(t) == 1)
+			{
+				continue;
+			}
+			else
+			{
+				printf("%c\n", t);
+				addvisited(t);
+				struct vertex *temp = graph[t - 'A'];
+				while (temp != 0)
+				{
+					if (checkvisit(temp->v) == 0)
+					{
+						push(temp->v);
+					}
+					temp = temp->next;
+				}
+			}
+		}
+	}
+}
+int main()
+{
+	addedge('A', 'B');
+	addedge('A', 'C');
+	addedge('A', 'D');
+	addedge('C', 'D');
+	addedge('C', 'E');
+	addedge('C', 'F');
+	addedge('F', 'G');
+	performDFS('B');
+}
+
+2. BFS구현
+#include <stdio.h>
+#include <stdlib.h>
+struct visit
+{
+	char v;
+	struct visit *left;
+	struct visit *right;
+};
+struct visit *visited = 0;
+struct vertex
+{
+	char v;
+	struct vertex *next;
+	struct vertex *con;
+};
+struct vertex *vertexes = 0;
+struct vertex *queue = 0;
+void enqueue(char src)
+{
+	struct vertex *new1 = (struct vertex *)malloc(sizeof(struct vertex));
+	new1->v = src;
+	new1->next = 0;
+
+	if (queue == 0)
+	{
+		queue = new1;
+	}
+	else
+	{
+		struct vertex *temp = queue;
+		while (temp->next != 0)
+		{
+			temp = temp->next;
+		}
+		temp->next = new1;
+	}
+}
+char dequeue()
+{
+	if (queue == 0)
+	{
+		return '-';
+	}
+	struct vertex *temp = queue;
+	char temp1 = temp->v;
+	queue = queue->next;
+	free(temp);
+	return temp1;
+}
+void addvertex(char src)
+{
+	struct vertex *temp = vertexes;
+	while (temp != 0)
+	{
+		if (temp->v == src)
+		{
+			return;
+		}
+		temp = temp->next;
+	}
+	struct vertex *new1 = (struct vertex *)malloc(sizeof(struct vertex));
+	new1->v = src;
+	new1->next = 0;
+	new1->con = 0;
+	if (vertexes == 0)
+	{
+		vertexes = new1;
+	}
+	else
+	{
+		temp = vertexes;
+		while (temp->next != 0)
+		{
+			temp = temp->next;
+		}
+		temp->next = new1;
+	}
+}
+void addedgemini(char src, char dst)
+{
+	struct vertex *temp = vertexes;
+	while (temp != 0)
+	{
+		if (temp->v == src)
+		{
+			break;
+		}
+		temp = temp->next;
+	}
+	struct vertex *new1 = (struct vertex *)malloc(sizeof(struct vertex));
+	new1->v = dst;
+	new1->next = new1->con = 0;
+	if (temp->con == 0)
+	{
+		temp->con = new1;
+	}
+	else
+	{
+		temp = temp->con;
+		while (temp->con != 0)
+		{
+			temp = temp->con;
+		}
+		temp->con = new1;
+	}
+}
+void addedge(char src, char dst)
+{
+	addvertex(src);
+	addvertex(dst);
+	addedgemini(src, dst);
+	addedgemini(dst, src);
+}
+int checkvisit(char src)
+{
+	struct visit *temp = visited;
+	while (temp != 0)
+	{
+		if (temp->v == src)
+		{
+			return 1;
+		}
+		if (temp->v > src)
+		{
+			temp = temp->left;
+		}
+		else
+		{
+			temp = temp->right;
+		}
+	}
+	return 0;
+}
+struct vertex* findvertex(char src)
+{
+	struct vertex *temp = vertexes;
+	while (temp != 0)
+	{
+		if (temp->v == src)
+		{
+			return temp;
+		}
+		temp = temp->next;
+	}
+}
+void addvisited(char src)
+{
+	struct visit *new1 = (struct visit*)malloc(sizeof(struct visit));
+	new1->v = src;
+	new1->left = new1->right = 0;
+	if (visited == 0)
+	{
+		visited = new1;
+	}
+	else
+	{
+		struct visit *temp = visited;
+		while (1)
+		{
+			if (temp->v > src)
+			{
+				if (temp->left == 0)
+				{
+					temp->left = new1;
+					return;
+				}
+				temp = temp->left;
+			}
+			else
+			{
+				if (temp->right == 0)
+				{
+					temp = temp->right = new1;
+					return;
+				}
+				temp = temp->right;
+			}
+		}
+	}
+}
+void performBFS(char src)
+{
+	enqueue(src);
+	while (1)
+	{
+		char t = dequeue();
+		if (t == '-')
+		{
+			return;
+		}
+		if (checkvisit(t) == 1)
+		{
+			continue;
+		}
+		else
+		{
+			printf("%c\n", t);
+			addvisited(t);
+			struct vertex *temp = findvertex(t);
+			temp = temp->con;
+			while (temp != 0)
+			{
+				if (checkvisit(temp->v) == 0)
+				{
+					enqueue(temp->v);
+				}
+				temp = temp->con;
+			}
+		}
+	}
+}
+int main()
+{
+	addedge('A', 'C');
+	addedge('B', 'C');
+	addedge('B', 'E');
+	addedge('B', 'D');
+	addedge('D', 'F');
+	performBFS('B');
+}
+
+3. MST배열
+#include <stdio.h>
+#include <stdlib.h>
+
+#define SZ 6
+
+struct edge
+{
+	char src;
+	char dst;
+	int weight;
+};
+
+char family[SZ] = { 'A', 'B', 'C', 'D', 'E', 'F' };
+
+int graph[SZ][SZ]; // all zeros
+int edge_cnt = 0;
+
+int areWeFamily(char v1, char v2)
+{
+	if (family[v1 - 'A'] == family[v2 - 'A'])
+	{
+		return 1;
+	}
+	else
+	{
+		return 0;
+	}
+}
+
+void justMarried(char v1, char v2)  // 'A', 'D'
+{
+	char familyMark_v1 = family[v1 - 'A'];
+	char familyMark_v2 = family[v2 - 'A'];
+
+	char newFamilyMark;   // 새로운 family mark
+	char toBeChanged;     // 바꿀 애들
+
+	if (familyMark_v1 < familyMark_v2)  // 알파벳 순서로 먼저 나오는 것이 newFamilyMark
+	{
+		newFamilyMark = familyMark_v1;
+		toBeChanged = familyMark_v2;
+	}
+	else
+	{
+		newFamilyMark = familyMark_v2;
+		toBeChanged = familyMark_v1;
+	}
+	// family에서, toBeChanged를 다 찾아서, newFamilyMark로 수정
+	for (int i = 0; i < SZ; i++)
+	{
+		if (family[i] == toBeChanged)
+		{
+			family[i] = newFamilyMark;
+		}
+	}
+
+}
+
+void addEdge(char src, char dst, int weight)
+{
+	edge_cnt += 1; // edge가 총 몇 개인지 count
+	graph[src - 'A'][dst - 'A'] = weight;
+	graph[dst - 'A'][src - 'A'] = weight;
+}
+
+struct edge *buildEdgeArray(void)
+{
+	struct edge * edgeArray = (struct edge *)malloc(sizeof(struct edge)*edge_cnt);
+	return edgeArray;
+}
+
+int main(void)
+{
+	addEdge('A', 'C', 1);
+	addEdge('A', 'B', 23);
+	addEdge('B', 'C', 10);
+	addEdge('B', 'D', 173);
+	addEdge('B', 'E', 5);
+	addEdge('C', 'D', 10);
+	addEdge('C', 'F', 5);
+	addEdge('D', 'E', 9);
+	addEdge('D', 'F', 12);
+	addEdge('E', 'F', 9);
+
+	struct edge * edgeArray = buildEdgeArray();
+
+	int idx = 0; // edgeArray에 넣기 위한 index
+
+	// graph 정보를 이용해서
+	// edge 정보를 edgeArray에 모두 입력
+	// 주의!! A-B edge인 경우, 하나만 입력
+	for (int i = 0; i < SZ; i++)
+	{
+		for (int j = 0; j < SZ; j++)
+		{
+			if (graph[i][j] > 0 && i < j)  // A-B만 edgeArray에 넣고, B-A는 넣지 않는다.
+			{
+				edgeArray[idx].src = 'A' + i;
+				edgeArray[idx].dst = 'A' + j;
+				edgeArray[idx].weight = graph[i][j];
+				idx += 1;
+			}
+		}
+	}
+
+	// edgeArray를 weight의 오름차순으로 정렬 -- by bubble sort
+	for (int i = 0; i < edge_cnt; i++)
+	{
+		for (int j = 0; j < edge_cnt - 1 - i; j++)
+		{
+			if (edgeArray[j].weight > edgeArray[j + 1].weight)
+			{
+				struct edge temp = edgeArray[j];
+				edgeArray[j] = edgeArray[j + 1];
+				edgeArray[j + 1] = temp;
+			}
+		}
+	}
+
+	// edgeArray를 출력
+	for (int i = 0; i < edge_cnt; i++)
+	{
+		printf("%c %c %d\n", edgeArray[i].src, edgeArray[i].dst, edgeArray[i].weight);
+	}
+
+	// MST를 찾아내서 출력하는 부분.
+	// ---> MST에 들어가는 edge들만 모두 출력
+
+	int mst_edge_cnt = 0;
+
+	for (int i = 0; i < edge_cnt; i++)  // 모든 edge를 하나씩 차례로,,,
+	{
+		struct edge E = edgeArray[i];
+		if (areWeFamily(E.src, E.dst) == 0)
+		{
+			mst_edge_cnt += 1;
+			printf("MST Edge %c -- %c : %d\n", E.src, E.dst, E.weight);
+			justMarried(E.src, E.dst);
+
+			if (mst_edge_cnt == SZ - 1)
+			{
+				break;
+			}
+		}
+		else
+		{
+			continue;
+		}
+	}
+	return 0;
+}
+4. MST코드
+#include <stdio.h>
+#include <stdlib.h>
+struct edge
+{
+	char v;
+	char v1;
+	int weight;
+	struct edge *next;
+};
+struct vertex
+{
+	char v;
+	struct vertex *next;
+	struct edge *con;
+};
+struct fam
+{
+	char v;
+	char v_fam;
+	struct fam *next;
+};
+struct edge *head = 0;
+struct vertex *vertexes = 0;
+struct fam *family = 0;
+int isinvertex(char src)
+{
+	struct vertex *temp = vertexes;
+	while (temp != 0)
+	{
+		if (temp->v == src)
+		{
+			return 1;
+		}
+		temp = temp->next;
+	}
+	return 0;
+}
+void addvertex(char src)
+{
+	if (isinvertex(src) == 1)
+	{
+		return;
+	}
+	struct vertex *new1 = (struct vertex *)malloc(sizeof(struct vertex));
+	new1->v = src;
+	new1->con = 0;
+	new1->next = 0;
+
+	if (vertexes == 0)
+	{
+		vertexes = new1;
+	}
+	else
+	{
+		struct vertex *temp = vertexes;
+		while (temp -> next != 0)
+		{
+			temp = temp->next;
+		}
+		temp->next = new1;
+	}
+}
+void addEdge(char src, char dst, int w)
+{
+	addvertex(src);
+	addvertex(dst);
+	struct edge *new1 = (struct edge *)malloc(sizeof(struct edge));
+	new1->v = src;
+	new1->v1 = dst;
+	new1->weight = w;
+	new1->next = 0;
+
+	if (head == 0)
+	{
+		head = new1;
+	}
+	else
+	{
+		struct edge *temp = head;
+		while (temp->next != 0)
+		{
+			temp = temp->next;
+		}
+		temp->next = new1;
+	}
+}
+struct vertex* findvertex(char src)
+{
+	struct vertex *temp = vertexes;
+	while (temp != 0)
+	{
+		if (temp->v == src)
+		{
+			return temp;
+		}
+		temp = temp->next;
+	}
+}
+void addedge2vertex()
+{
+	struct edge *temp = head;
+	while (temp != 0)
+	{
+		struct vertex *temp1=findvertex(temp->v);
+		struct edge *new1 = (struct edge *)malloc(sizeof(struct edge));
+		new1->v1 = temp->v1;
+		new1->weight = temp->weight;
+		new1->next = 0;
+		if (temp1->con == 0)
+		{
+			temp1->con = new1;
+		}
+		else
+		{
+			struct edge *temp2 = temp1->con;
+			while (temp2->next != 0)
+			{
+				temp2 = temp2->next;
+			}
+			temp2->next = new1;
+		}
+		temp = temp->next;
+	}
+}
+int cntedge()
+{
+	int cnt = 0;
+	struct edge *temp = head;
+	while (temp != 0)
+	{
+		temp = temp->next;
+		cnt++;
+	}
+	return cnt;
+}
+char findfam(char src)
+{
+	struct fam *temp = family;
+	while (temp != 0)
+	{
+		if (temp->v == src)
+		{
+			return temp->v_fam;
+		}
+		temp = temp->next;
+	}
+}
+void changefam(char src, char dst)
+{
+	struct fam *temp1 = family;
+	struct fam *temp = family;
+	while (temp != 0)
+	{
+		if (temp->v == src)
+		{
+			break;
+		}
+		temp = temp->next;
+	}
+	while (temp1 != 0)
+	{
+		if (temp1->v == dst)
+		{
+			break;
+		}
+		temp1 = temp1->next;
+	}
+	struct fam *temp2 = family;
+	while (temp2 != 0)
+	{
+		if (temp2->v_fam == temp->v_fam)
+		{
+			temp2->v_fam = temp->v_fam;
+		}
+		temp2 = temp2->next;
+	}
+}
+int howmanyvertex()
+{
+	int cnt = 0;
+	struct vertex *temp = vertexes;
+	while (temp != 0)
+	{
+		temp = temp->next;
+		cnt++;
+	}
+	return cnt;
+}
+void doMST(struct edge *edgearray)
+{
+	int cnt = cntedge();
+	int mstcnt = 0;
+	for (int i = 0; i < cnt; i++)
+	{
+		if (findfam(edgearray[i].v) == findfam(edgearray[i].v1))
+		{
+			continue;
+		}
+		else
+		{
+			printf("%c ----> %c\n", edgearray[i].v, edgearray[i].v1);
+			changefam(edgearray[i].v, edgearray[i].v1);
+			mstcnt++;
+			if (mstcnt == howmanyvertex() - 1)
+			{
+				break;
+			}
+		}
+	}
+}
+void resetfam()
+{
+	struct vertex *temp = vertexes;
+	while (temp != 0)
+	{
+		struct fam *new1 = (struct fam*)malloc(sizeof(struct fam));
+		new1->v = temp->v;
+		new1->v_fam = temp->v;
+		new1->next = 0;
+		if (family == 0)
+		{
+			family = new1;
+		}
+		else
+		{
+			struct fam *temp1 = family;
+			while (temp1->next != 0)
+			{
+				temp1 = temp1->next;
+			}
+			temp1->next = new1;
+		}
+		temp = temp->next;
+	}
+}
+int main()
+{
+	addEdge('A', 'C', 1);
+	addEdge('A', 'B', 23);
+	addEdge('B', 'C', 10);
+	addEdge('B', 'D', 173);
+	addEdge('B', 'E', 5);
+	addEdge('C', 'D', 10);
+	addEdge('C', 'F', 5);
+	addEdge('D', 'E', 9);
+	addEdge('D', 'F', 12);
+	addEdge('E', 'F', 9);
+	addedge2vertex();
+	int cnt = cntedge();
+	struct edge *c = head;
+	struct edge *edgearray = (struct edge*)malloc(sizeof(struct edge)*cnt);
+	for (int i = 0; i < cnt; i++)
+	{
+		edgearray[i] = *c;
+		c = c->next;
+	}
+	for (int i = 1; i < cnt; i++)
+	{
+		for (int j = 0; j < cnt - i; j++)
+		{
+			if (edgearray[j].weight > edgearray[j + 1].weight)
+			{
+				struct edge temp = edgearray[j];
+				edgearray[j] = edgearray[j + 1];
+				edgearray[j + 1] = temp;
+			}
+		}
+	}
+	resetfam();
+	doMST(edgearray);
+}

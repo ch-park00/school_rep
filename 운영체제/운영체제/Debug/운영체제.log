@@ -1,0 +1,9 @@
+﻿  소스.cpp
+c:\users\chpark\source\repos\운영체제\운영체제\소스.cpp(5): warning C4005: 'max': 매크로 재정의
+  c:\program files (x86)\windows kits\10\include\10.0.17134.0\shared\minwindef.h(193): note: 'max'의 이전 정의를 참조하십시오.
+c:\users\chpark\source\repos\운영체제\운영체제\소스.cpp(79): warning C4244: '인수': 'time_t'에서 'unsigned int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\chpark\source\repos\운영체제\운영체제\소스.cpp(76): warning C4996: 'scanf': This function or variable may be unsafe. Consider using scanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.17134.0\ucrt\stdio.h(1274): note: 'scanf' 선언을 참조하십시오.
+c:\users\chpark\source\repos\운영체제\운영체제\소스.cpp(78): warning C4996: 'scanf': This function or variable may be unsafe. Consider using scanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.17134.0\ucrt\stdio.h(1274): note: 'scanf' 선언을 참조하십시오.
+  운영체제.vcxproj -> C:\Users\chpark\source\repos\운영체제\Debug\운영체제.exe

@@ -1,0 +1,20 @@
+void led()
+{
+	PORTB=0xFF;
+	PORTC=0xFF;
+	for (int i=0;i<8;i++)
+	{
+		if (i<4)
+		{
+			PORTB=~(0x01<<i);
+			PORTC=~(0x08>>i);
+			_delay_ms(100);
+		}
+		else
+		{
+			PORTB=~(0x08>>(i-4));
+			PORTC=~(0x01<<(i-4));
+			_delay_ms(100);
+		}
+	}
+};

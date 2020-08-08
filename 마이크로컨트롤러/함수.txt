@@ -1,0 +1,27 @@
+char *ptr = strstr(s1, "den");
+와 같이 strstr 함수에 문자열과 검색할 문자열을 넣어주면 해당 문자열로 시작하는 문자열의 위치(포인터)를 반환합니다.
+여기서는 "A Garden Diary"에서 "den"로 시작하는 문자열을 찾으므로 "den Diary"가 나옵니다. 즉, 검색한 문자 "den"만 나오지 않고 뒤에 오는 모든 문자열이 나옵니다(NULL이 나오기 전까지).
+
+void *memset(void *buffer, int c, size_t n); 메모리를 설정하는 함수
+
+입력 매개 변수 리스트
+
+buffer 버퍼
+
+c 설정할 값
+
+n 설정할 바이트 수
+
+반환 값 = buffer
+
+
+메모리 영역을 복사합니다. 이와 유사한 함수로 memmove()가 있습니다만 이 함수와는 달리 동일 영역, 즉 자기 자신에 대한 복사는 할 수 없습니다.
+
+헤더	string.h
+형태	void *memcpy(void *s1, const void *s2, size_t n);
+인수	
+void *s1	복사될 메모리의 포인터
+void *s2	복사할 메모리의 포인터
+size_t size	복사할 바이트 갯 수
+반환	
+void *	s1 포인터를 반환하며 실패하면 NULL을 반환한다.

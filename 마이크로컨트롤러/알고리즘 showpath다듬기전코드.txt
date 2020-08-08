@@ -1,0 +1,64 @@
+void showpath(int idx)
+{
+	int cnt = 0;
+	stack = 0;
+	int idx1 = idx;
+	struct stationinfo *temp = findnamebyid(dtable[idx1].id);
+	push(temp->name);
+	char *startname = temp->name;
+	char data_prev[100] = { 0 };
+	char data_prev1[100] = { 0 };
+	char *linenum_s;
+	char *linenum_d;
+	while (1)
+	{
+		if (dtable[idx1].prev == 0)
+		{
+			struct stationinfo *dst_station = findnamebyid(dtable[idx1].id);
+			while (1)
+			{
+				
+				char *data = pop();
+				if (data == 0)
+				{
+					return;
+				}
+				if (strcmp(data_prev, data) == 0)
+				{
+					if (strcmp(startname, data) == 0 || strcmp(dst_station->name, data) == 0)
+					{
+						continue;
+					}
+					else
+					{
+						if (cnt == 1)
+						{
+							continue;
+						}
+						else
+						{
+							struct stationinfo *a = findnamebyid(findstationbyname(data_prev1));
+							linenum_s = a->linenum;
+							cnt++;
+						}
+					}
+				}
+				else
+				{
+					if (cnt == 1)
+					{
+						struct stationinfo *a1 = findnamebyid(findstationbyname(data));
+						printf("(È¯½Â:%s ->%s)\n", linenum_s, a1->linenum);
+					}
+					cnt = 0;
+					printf("%s\n", data);
+				}
+				strcpy(data_prev1, data_prev);
+				strcpy(data_prev, data);
+			}
+		}
+		idx1 = findtable(dtable[idx1].prev);
+		temp = findnamebyid(dtable[idx1].id);
+		push(temp->name);
+	}
+}

@@ -1,0 +1,158 @@
+#include <avr/io.h>
+#define F_CPU 16000000UL
+#include <util/delay.h>
+#include <avr/interrupt.h>
+#define BAUD_9600 103
+
+unsigned char send_char=0;
+ISR(INT0_vect)
+{
+	send_char='A';
+	EIFR|=0x01;
+	sei();
+}
+ISR(INT1_vect)
+{
+	send_char='B';
+	EIFR|=0x02;
+	sei();
+}
+int main()
+{
+	cli();
+	DDRD=0xF0;
+	EICRA=0xAA;
+	EIMSK=0X0F;
+	EIFR|=0X0F;
+
+	UBRR0H=(unsigned char)(BAUD_9600>>8);
+	UBRR0L=(unsigned char)(BAUD_9600);
+	UCSR0B=(1<<TXEN0)|(1<<RXEN0);
+	UCSR0C=(1<<UCSZ01)|(1<<UCSZ00);
+
+	sei();
+	while(1)
+	{
+		if (send_char)
+		{
+			while(!(UCSR0A&1<<UDRE0));
+			UDR0=send_char;
+			send_char=0;
+		}
+	}
+
+}
+
+//
+#include <avr/io.h>
+#define F_CPU 16000000UL
+#include <util/delay.h>
+#include <avr/interrupt.h>
+#define BAUD_9600 103
+
+unsigned char send_char=0;
+ISR(INT0_vect)
+{
+	send_char='A';
+	EIFR|=0x01;
+	sei();
+}
+ISR(INT1_vect)
+{
+	send_char='B';
+	EIFR|=0x02;
+	sei();
+}
+int main()
+{
+	unsigned char Rx_char=0;
+	cli();
+	DDRD=0xF0;
+	EICRA=0xAA;
+	EIMSK=0X0F;
+	EIFR|=0X0F;
+
+	UBRR0H=(unsigned char)(BAUD_9600>>8);
+	UBRR0L=(unsigned char)(BAUD_9600);
+	UCSR0B=(1<<TXEN0)|(1<<RXEN0);
+	UCSR0C=(1<<UCSZ01)|(1<<UCSZ00);
+
+	sei();
+	while(1)
+	{
+		while(!(UCSR0A&(1<<RXC0)));
+		Rx_char=UDR0;
+
+		while(!(UCSR0A&(1<<UDRE0)));
+		UDR0=Rx_char;
+	}
+}
+//
+#include <avr/io.h>
+#define F_CPU 16000000UL
+#include <util/delay.h>
+#include <avr/interrupt.h>
+#define BAUD_9600 103
+#define MAX_bufsize 128
+unsigned char tx_buf[MAX_bufsize];
+int buf_len=0;
+void tx_char(unsigned char txchar)
+{
+	while(!(UCSR0A&(1<<UDRE0)));
+	UDR0=txchar;
+}
+void tx_str(unsigned char *txchar,int len)
+{
+	int i;
+	for (i=0;i<len;i++)
+	{
+		tx_char(txchar[i]);
+	}
+}
+ISR(INT0_vect)
+{
+	unsigned char *tmp;
+	tmp=malloc(30);
+	memset(tmp,'\0',30);
+	tmp="INT0 PUSHED\n";
+	buf_len=strlen(tmp);
+	strncpy(tx_buf,tmp,buf_len);
+	EIFR|=0x01;
+	sei();
+}
+ISR(INT1_vect)
+{
+	unsigned char *tmp;
+	tmp=malloc(30);
+	memset(tmp,'\0',30);
+	tmp="INT1 PUSHED\n";
+	buf_len=strlen(tmp);
+	strncpy(tx_buf,tmp,buf_len);
+	EIFR|=0x02;
+	sei();
+}
+int main()
+{
+	unsigned char Rx_char=0;
+	cli();
+	DDRD=0xF0;
+	EICRA=0xAA;
+	EIMSK=0X0F;
+	EIFR|=0X0F;
+
+	UBRR0H=(unsigned char)(BAUD_9600>>8);
+	UBRR0L=(unsigned char)(BAUD_9600);
+	UCSR0B=(1<<TXEN0)|(1<<RXEN0);
+	UCSR0C=(1<<UCSZ01)|(1<<UCSZ00);
+
+	sei();
+	while(1)
+	{
+		if (buf_len>0)
+		{
+			tx_str(tx_buf,buf_len);
+			memset(tx_buf,'\0',MAX_bufsize);
+			buf_len=0;
+		}
+	}
+}
