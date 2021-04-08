@@ -1,0 +1,23 @@
+#해당 생성 파일 중 일부만 수정될 경우에는 수정된 파일과 해당 파일과 의존성을 가지는 파일만 다시 컴파일된다.
+
+#매크로 정의
+all: ./bin/myapp
+
+#실제 파일 컴파일 및 생성
+
+
+./bin/myapp : ./obj/foo.o ./obj/goo.o ./obj/myapp.o 
+	gcc -o bin/myapp obj/foo.o obj/goo.o obj/myapp.o -I./include
+
+./obj/myapp.o : ./include/funcs.h ./src/myapp.c 
+	gcc -c src/myapp.c -o obj/myapp.o -I./include  
+
+./obj/foo.o : ./src/foo.c 
+	gcc -c src/foo.c -o obj/foo.o -I./include
+
+./obj/goo.o : ./src/goo.c 
+	gcc -c src/goo.c -o obj/goo.o -I./include
+
+clean :
+	rm ./obj/*
+	rm ./bin/*
